@@ -4,17 +4,17 @@ A milestone closes when its acceptance criteria are met, with evidence in
 [TEST_REPORTS.md](TEST_REPORTS.md) — not when its files exist. "Hardware"
 means a run on a real console, recorded.
 
-| Milestone | State | Acceptance |
-|---|---|---|
-| **M0** Research and architecture | done | feasibility audit with evidence; ADRs; revisions pinned |
-| **M1** Native PS5 application | built, awaiting hardware | title builds, signs and packages (done); starts from the home screen, draws, reads the pad, exits cleanly (hardware) |
-| **M2** ELF loading proof | built, awaiting hardware | loader passes host tests (done); the Diagnostics self-test passes on a console (hardware). If it fails, the blocker is recorded and Roblox work stops |
-| **M3** Android compatibility runtime | not started | AOSP linker ported; bionic ABI layer; libjnivm; a synthetic Android library initialised through `JNI_OnLoad` and GameActivity on a host and a console |
-| **M4** Graphics and audio | not started | RADV linked; a synthetic Android Vulkan program draws through the virtual `libvulkan` and `VK_KHR_display`; OpenSL ES plays through AudioOut |
-| **M5** Roblox engine initialisation | not started | the user's `libroblox.so` loads, constructors run, `JNI_OnLoad` and GameActivity's native init complete, the engine logs its own start-up |
-| **M6** Authentication and networking | not started | HTTPS from the engine; Quick Sign-in completes; UDP works from a title |
-| **M7** First verified experience | not started | a public experience loads and the player moves, on a console |
-| **M8** Alpha release | not started | M1–M7 on hardware, documented, reproducible |
+| Milestone | State | Acceptance | Issue |
+|---|---|---|---|
+| **M0** Research and architecture | done | feasibility audit with evidence; ADRs; revisions pinned | [#9](https://github.com/YTDxDAkeno/AKENOBLOX/issues/9) |
+| **M1** Native PS5 application | built, awaiting hardware | title builds, signs and packages (done); starts from the home screen, draws, reads the pad, exits cleanly (hardware) | [#1](https://github.com/YTDxDAkeno/AKENOBLOX/issues/1) |
+| **M2** ELF loading proof | built, awaiting hardware | loader passes host tests (done); the Diagnostics self-test passes on a console (hardware). If it fails, the blocker is recorded and Roblox work stops | [#2](https://github.com/YTDxDAkeno/AKENOBLOX/issues/2) |
+| **M3** Android compatibility runtime | not started | AOSP linker ported; bionic ABI layer; libjnivm; a synthetic Android library initialised through `JNI_OnLoad` and GameActivity on a host and a console | [#3](https://github.com/YTDxDAkeno/AKENOBLOX/issues/3) |
+| **M4** Graphics and audio | not started | RADV linked; a synthetic Android Vulkan program draws through the virtual `libvulkan` and `VK_KHR_display`; OpenSL ES plays through AudioOut | [#4](https://github.com/YTDxDAkeno/AKENOBLOX/issues/4) |
+| **M5** Roblox engine initialisation | not started | the user's `libroblox.so` loads, constructors run, `JNI_OnLoad` and GameActivity's native init complete, the engine logs its own start-up | [#5](https://github.com/YTDxDAkeno/AKENOBLOX/issues/5) |
+| **M6** Authentication and networking | not started | HTTPS from the engine; Quick Sign-in completes; UDP works from a title | [#6](https://github.com/YTDxDAkeno/AKENOBLOX/issues/6) |
+| **M7** First verified experience | not started | a public experience loads and the player moves, on a console | [#7](https://github.com/YTDxDAkeno/AKENOBLOX/issues/7) |
+| **M8** Alpha release | not started | M1–M7 on hardware, documented, reproducible | [#8](https://github.com/YTDxDAkeno/AKENOBLOX/issues/8) |
 
 ## Next concrete tasks
 

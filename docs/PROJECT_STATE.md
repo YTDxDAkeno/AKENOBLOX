@@ -51,11 +51,18 @@ regression test.)
 | Can a title use UDP? | multiplayer (M6) | a UDP probe in Diagnostics |
 | Roblox does not permit third-party clients | legitimate use | policy; not technical. Test accounts only |
 
+## Tracking
+
+One GitHub issue per milestone: M0 [#9](https://github.com/YTDxDAkeno/AKENOBLOX/issues/9)
+(closed, done), M1–M8 [#1](https://github.com/YTDxDAkeno/AKENOBLOX/issues/1)–[#8](https://github.com/YTDxDAkeno/AKENOBLOX/issues/8),
+each with its acceptance checklist. Tick the boxes there when evidence lands
+in TEST_REPORTS.md.
+
 ## Next tasks
 
-1. Get a console run of v0.1.0-alpha (HARDWARE_TESTING.md tests 1-2). If the
-   self-test fails, record it in FEASIBILITY.md and stop Roblox work until it
-   is understood.
+1. Get a console run of v0.1.0-alpha (HARDWARE_TESTING.md tests 1-2; issues
+   #1 and #2). If the self-test fails, record it in FEASIBILITY.md and stop
+   Roblox work until it is understood.
 2. Under Cordial on Linux, record the engine's `syscall` numbers and Vulkan
    feature requests.
 3. Port the AOSP linker (patches in `patches/`), tested against the existing
