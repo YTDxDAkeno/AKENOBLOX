@@ -1,0 +1,50 @@
+# AkenoBlox PS5 - the console title: fetch the pinned SDK and PS5_Vulkan,
+# cross-build, link, sign, package. A green run is CROSS-BUILD VERIFIED: it
+# says nothing about whether the title runs on a console, and nothing at all
+# about Roblox (docs/TEST_REPORTS.md).
+name: PS5 cross-build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  title:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ninja-build clang lld libclang-rt-18-dev unzip
+      - name: Cache pinned dependencies
+        uses: actions/cache@v4
+        with:
+          path: .deps
+          key: ps5-deps-${{ hashFiles('tools/build/setup-ps5-deps.sh') }}
+      - name: Build the title
+        run: tools/build/build-ps5.sh
+      - name: Inspect
+        run: |
+          ls -la dist/PPSA99256 dist/PPSA99256/sce_sys dist/PPSA99256/sce_module
+          cat build-ps5/title/eboot.inspect.txt
+          echo "imports: $(wc -l < build-ps5/title/imports.txt)"
+          {
+            echo "### PS5 cross-build"
+            echo
+            echo "CROSS-BUILD only. Not run on a console; does not run Roblox."
+            echo
+            echo '```'
+            cat build-ps5/title/eboot.inspect.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: akenoblox-ps5-title
+          path: release/*.zip

@@ -1,0 +1,26 @@
+# Builds
+/build*/
+/dist/
+/release/*.zip
+/.deps/
+/akeno-data/
+compile_commands.json
+
+# Fuzzing artifacts
+crash-*
+leak-*
+timeout-*
+oom-*
+
+# Never commit Roblox files or anyone's console address (docs/SECURITY.md)
+*.apk
+*.xapk
+*.apks
+libroblox.so
+.env
+
+# Editors
+.vscode/
+.idea/
+*.swp
+__pycache__/

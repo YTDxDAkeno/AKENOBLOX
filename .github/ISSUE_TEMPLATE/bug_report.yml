@@ -1,0 +1,37 @@
+name: Bug report
+description: AkenoBlox misbehaves at something it already does.
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: input
+    id: build
+    attributes:
+      label: AkenoBlox build
+      placeholder: "0.1.0-alpha (1a2b3c4d5)"
+    validations:
+      required: true
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where
+      options: ["PS5 console", "host build (Linux)", "PS5 cross-build", "CI"]
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected and actual
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: logs/akenoblox.log, diagnostics.txt or klog. No account names, cookies or tokens.
+      render: text

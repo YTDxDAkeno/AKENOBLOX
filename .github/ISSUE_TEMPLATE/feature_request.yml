@@ -1,0 +1,19 @@
+name: Feature request
+description: Something AkenoBlox should be able to do.
+title: "[feature] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Out of scope, permanently: streaming or remote play, PSN, patching or hooking Roblox, cheats, detection evasion, shipping Roblox files.
+  - type: textarea
+    id: what
+    attributes:
+      label: What and why
+    validations:
+      required: true
+  - type: textarea
+    id: milestone
+    attributes:
+      label: Which milestone it belongs to (docs/ROADMAP.md)

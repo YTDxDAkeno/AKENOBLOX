@@ -1,0 +1,74 @@
+# AkenoBlox PS5 - every push and pull request: the host build, its tests under
+# GCC, Clang and sanitizers, and a short fuzz of the loader.
+# A green run is HOST VERIFIED, nothing more (docs/TEST_REPORTS.md).
+name: Host CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  host:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: gcc
+            cc: gcc
+            options: ""
+          - name: clang-asan-ubsan
+            cc: clang
+            options: "-DAKENO_SANITIZE=ON"
+    name: host (${{ matrix.name }})
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ninja-build clang lld libclang-rt-18-dev
+      - name: Configure
+        run: cmake -S . -B build -G Ninja -DCMAKE_C_COMPILER=${{ matrix.cc }} -DCMAKE_BUILD_TYPE=Debug ${{ matrix.options }}
+      - name: Build
+        run: cmake --build build
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+      - name: Diagnostics report
+        run: ./build/akenoblox-host --storage "$RUNNER_TEMP/akeno" --diagnostics diagnostics.txt && cat diagnostics.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: host-${{ matrix.name }}
+          path: |
+            diagnostics.txt
+            build/journey/
+          if-no-files-found: ignore
+
+  fuzz:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ninja-build clang lld libclang-rt-18-dev
+      - name: Build fuzzers
+        run: |
+          cmake -S . -B build -G Ninja -DCMAKE_C_COMPILER=clang -DAKENO_FUZZ=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
+          cmake --build build
+      - name: Fuzz (60 s each)
+        run: |
+          mkdir -p corpus/elf corpus/settings artifacts
+          cp build/fixtures/*.so tests/fixtures/regress/* corpus/elf/
+          printf 'resolution=1920x1080\nvsync=true\n' > corpus/settings/seed
+          ./build/tests/fuzz_elf_parse -max_total_time=60 -artifact_prefix=artifacts/ corpus/elf
+          ./build/tests/fuzz_elf_load -max_total_time=60 -rss_limit_mb=4096 -artifact_prefix=artifacts/ corpus/elf
+          ./build/tests/fuzz_settings -max_total_time=30 -artifact_prefix=artifacts/ corpus/settings
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: fuzz-artifacts
+          path: artifacts/

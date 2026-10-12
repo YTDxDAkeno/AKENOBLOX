@@ -1,0 +1,64 @@
+name: Hardware test report
+description: You ran AkenoBlox on a PS5 (docs/HARDWARE_TESTING.md). Pass or fail, this is the most useful report there is.
+title: "[hardware] "
+labels: ["hardware-test"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you. Never paste account names, cookies or tokens; nothing in these tests produces any.
+  - type: input
+    id: build
+    attributes:
+      label: AkenoBlox build
+      description: The version and commit from the header or About screen, or BUILD.txt in the ZIP.
+      placeholder: "0.1.0-alpha (1a2b3c4d5)"
+    validations:
+      required: true
+  - type: input
+    id: console
+    attributes:
+      label: Console and firmware
+      placeholder: "PS5 (CFI-1216A), 4.03"
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Jailbreak, enabler and loader, with versions
+      placeholder: "etaHEN 2.x, ShadowMountPlus 1.7-beta5fix1"
+    validations:
+      required: true
+  - type: dropdown
+    id: test1
+    attributes:
+      label: "Test 1: the title starts, draws, reads the pad, exits"
+      options: ["passed", "failed", "not run"]
+    validations:
+      required: true
+  - type: dropdown
+    id: test2
+    attributes:
+      label: "Test 2: Diagnostics probes and ELF self-test"
+      options: ["self-test PASSED", "self-test FAILED", "crashed during probes", "not run"]
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you saw at each step. A photo of the screen helps if it looked wrong.
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: diagnostics.txt
+      description: Saved with Square on the Diagnostics screen.
+      render: text
+  - type: textarea
+    id: klog
+    attributes:
+      label: klog capture
+      description: From tools/deploy/klog.py, or attach the file.
+      render: text

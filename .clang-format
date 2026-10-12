@@ -1,0 +1,12 @@
+# The house style: three-space indents, 100 columns, braces on the function's
+# own line. Run on changed lines only (git clang-format); not enforced in CI
+# yet, so a reformat never hides a change in review.
+BasedOnStyle: LLVM
+IndentWidth: 3
+ColumnLimit: 100
+BreakBeforeBraces: Linux
+AlwaysBreakAfterReturnType: TopLevelDefinitions
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortCaseLabelsOnASingleLine: true
+SortIncludes: false

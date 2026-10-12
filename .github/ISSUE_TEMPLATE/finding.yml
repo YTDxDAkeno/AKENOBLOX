@@ -1,0 +1,24 @@
+name: Finding
+description: You established or disproved something about the console, the engine or a reference project.
+title: "[finding] "
+labels: ["finding"]
+body:
+  - type: textarea
+    id: claim
+    attributes:
+      label: The finding
+      description: One or two sentences.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: What you ran, on what, and what it printed. Mark anything reasoned rather than measured as INFERRED.
+    validations:
+      required: true
+  - type: textarea
+    id: affects
+    attributes:
+      label: What it changes
+      description: Which row of docs/FEASIBILITY.md or which decision it affects.
