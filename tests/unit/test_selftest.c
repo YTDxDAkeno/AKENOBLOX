@@ -9,6 +9,7 @@
 #include "diagnostics/akeno_cpu.h"
 #include "diagnostics/akeno_report.h"
 #include "diagnostics/akeno_selftest.h"
+#include "diagnostics/akeno_udp.h"
 
 static void
 run_with(const akeno_mem_ops *mem)
@@ -67,6 +68,15 @@ test_fs_probe_on_host(void)
 }
 
 static void
+test_udp_loopback(void)
+{
+   char summary[128];
+   CHECK_EQ_INT(akeno_udp_loopback_probe(summary, sizeof(summary)), 0);
+   CHECK(strstr(summary, "UDP IPv4 loopback") != NULL);
+   CHECK_EQ_INT(akeno_udp_loopback_probe(NULL, 0), -1);
+}
+
+static void
 test_report(void)
 {
    akeno_report r;
@@ -94,6 +104,7 @@ static const akeno_test_case cases[] = {
    {"cpu_levels", test_cpu_levels},
    {"fs_probe_on_host", test_fs_probe_on_host},
    {"report", test_report},
+   {"udp_loopback", test_udp_loopback},
 };
 
 AKENO_TEST_MAIN(cases)
