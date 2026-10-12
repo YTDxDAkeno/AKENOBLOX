@@ -14,7 +14,11 @@ passed** (four consecutive runs), including executing relocated x86-64
 code from the console's allocated executable pages. The launcher displayed
 1080p frames, recognized DualSense and wrote to `/download0/akenoblox`.
 Two distinct issues remain: DNS to `www.roblox.com` failed with resolver
-code 4; and the observed `%fs:0x28` stack-guard slot was stable but **zero**.
+code 4; the user subsequently confirmed their PS5 intentionally uses primary
+DNS `62.210.38.117` for PSN blocking. This makes resolver policy/availability
+a candidate cause, but does **not** establish that this DNS produced the error.
+A neutral control-domain lookup is now included in the diagnostics branch;
+do not change the console DNS to run it. The other issue: the observed `%fs:0x28` stack-guard slot was stable but **zero**.
 That confirms the test fixture's call/return path, **not** Android stack
 protector initialization or entropy. See [TEST_REPORTS.md](TEST_REPORTS.md).
 
