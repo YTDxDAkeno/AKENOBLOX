@@ -23,14 +23,46 @@ evidence that Roblox runs anywhere: it does not, yet.
 |---|---|
 | ELF loader: parse, copy, relocate (RELA, APS2, RELR), protect, symbols | HOST VERIFIED |
 | ELF loader at 16 KiB pages | HOST VERIFIED (emulated page size) |
-| ELF loader on the console's executable memory | CROSS-BUILD VERIFIED; NOT TESTED on hardware |
+| ELF loader on the console's executable memory | **HARDWARE VERIFIED** on 13.09 with 13/13 fixture probes |
 | ELF loader against malformed input (sweeps and libFuzzer) | HOST VERIFIED |
 | Launcher menus, settings, input mapping, rendering | HOST VERIFIED |
-| Launcher on the console (display, pad, storage, exit) | CROSS-BUILD VERIFIED; NOT TESTED on hardware |
+| Launcher on the console (display, pad, storage, exit) | Display, pad, storage **HARDWARE VERIFIED** on 13.09; clean exit not documented |
 | Title packaging (`eboot.bin`, `sce_sys`, `libc.prx`) | CROSS-BUILD VERIFIED |
 | AOSP linker for the console | FAILED to compile: 18 errors, understood (FEASIBILITY §3.4) |
 | Rust std for the console | links; native TLS model incompatible (FEASIBILITY §3.6) |
 | Everything Roblox | NOT TESTED |
+
+## 2026-10-12 — first real PS5 hardware report, build `80a3f11f9`
+
+**Evidence:** User supplied `diagnostics.txt` and `akenoblox.log` from an actual
+PS5. Results were reviewed on 2026-10-12. Firmware **13.090.001**
+(`0x13090001`), console title `PPSA99256`, SDK v0.42.
+**These results apply to the original `80a3f11f9` build, not the later
+`chatgpt/udp-loopback-diagnostics` branch.** Full logs were provided
+privately for review; this summary avoids distributing raw machine data.
+
+| Feature | Result / evidence |
+|---|---|
+| Launcher starts and displays 1920x1080 via VideoOut | **HARDWARE VERIFIED**: report row `Display ok`, runtime log `display: 1920x1080` |
+| DualSense | **HARDWARE VERIFIED**: `Controller connected` at startup |
+| Writable storage | **HARDWARE VERIFIED**: `/download0/akenoblox`; saved `diagnostics.txt` |
+| CPU floor | **HARDWARE VERIFIED**: x86-64-v3; AVX enabled in XCR0 |
+| ELF loader | **HARDWARE VERIFIED** for the embedded synthetic Android x86-64 fixtures: **13/13 passed**, run four times (712, 670, 669, 713 microseconds) |
+| Relocation and executable memory | **HARDWARE VERIFIED**: APS2 / RELR, 16 KiB pages, W^X (0 W+X pages), constructors/destructors, PLT, GLOB_DAT, loaded code called |
+| Stack-protector test | **PASS for the fixture**, but **ABI completeness NOT VERIFIED**: `%fs:0x28` was stable on both threads yet read as **zero**; investigate actual guard initialization, randomness and consistency with Android |
+| DNS | **FAILED/WARN**: `getaddrinfo("www.roblox.com", "443")` returned 4; no confirmed external DNS or Internet |
+| UDP | **NOT TESTED** in this build; a local-only probe exists separately in PR #10, awaiting a console run |
+| Normal exit to PS5 Home | **NOT VERIFIED**: user log contains no exit event |
+| Real Roblox library loading / game rendering | **NOT TESTED**: `libroblox.so` was not installed on the console |
+
+The `ELF loader` self-test gives positive evidence that this firmware can
+execute the loaded synthetic x86-64 fixture. It does **not** establish that
+the full AOSP linker, Android libc ABI, Vulkan surface translation, network
+services, or Roblox authentication work.
+
+**M2 gate:** passed for the tested loader subset; proceed with the Android
+linker port, subject to the distinct ABI and network blockers. Do not expand
+the result to other firmwares or untested Roblox builds.
 
 ## 2026-10-12 — session 1, clean build of `764c088`
 
