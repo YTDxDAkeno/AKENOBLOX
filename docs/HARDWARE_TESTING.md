@@ -1,7 +1,8 @@
 # Testing on a console
 
-Nothing in this project has run on a PS5 yet. This page is how to change
-that, and exactly what to send back. Every result, pass or fail, goes into
+The original build `80a3f11f9` passed its synthetic ELF loader self-test
+on a real PS5 running firmware 13.09 (13/13 steps, four runs). This page
+explains how to reproduce it on other builds and what still needs testing. Every result, pass or fail, goes into
 [TEST_REPORTS.md](TEST_REPORTS.md) at the same level of detail.
 
 > [!CAUTION]
@@ -51,7 +52,7 @@ What the results mean:
 |---|---|---|
 | x86-64 level | v2 or better: the engine's instructions run | v1: instruction emulation needed (libbadcpu) |
 | AVX state saved | the kernel enables AVX for titles | AVX code paths would fault |
-| `%fs:0x28`, main and new thread | Android's stack protector can work unmodified | **a blocker for the current architecture**: record it exactly |
+| `%fs:0x28`, main and new thread | stable and nonzero is encouraging but not full Android ABI proof | a changed or **zero** guard requires investigation; 13.09 showed stable zero |
 | ELF self-test: copy, relocate, protect | the console executes code a title copied in | **Phase 2 blocked**: record the step that failed |
 | Android stack protector | a protected call completed | the canary word moved during a call |
 | UDP IPv4 loopback | local datagram sockets work | inspect errno and console network initialization; external multiplayer remains untested either way |
