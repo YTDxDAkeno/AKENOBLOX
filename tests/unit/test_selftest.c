@@ -87,6 +87,26 @@ test_report_redacts_canary(void)
 }
 
 static void
+test_report_warns_zero_canary(void)
+{
+   akeno_fs_probe p = {0};
+   p.ran = true;
+   p.main_stable = true;
+   p.main_first = 0;
+   p.thread_ran = true;
+   p.thread_stable = true;
+   p.thread_first = 0;
+   akeno_report r;
+   akeno_report_clear(&r);
+   akeno_report_fs_probe(&r, &p);
+   CHECK_EQ_INT(r.count, 2);
+   CHECK(r.rows[0].status == AKENO_ROW_WARN);
+   CHECK(r.rows[1].status == AKENO_ROW_WARN);
+   CHECK(strstr(r.rows[0].value, "zero value") != NULL);
+   CHECK(strstr(r.rows[0].value, "redacted") != NULL);
+}
+
+static void
 test_udp_loopback(void)
 {
    char summary[128];
@@ -125,6 +145,7 @@ static const akeno_test_case cases[] = {
    {"report", test_report},
    {"udp_loopback", test_udp_loopback},
    {"report_redacts_canary", test_report_redacts_canary},
+   {"report_warns_zero_canary", test_report_warns_zero_canary},
 };
 
 AKENO_TEST_MAIN(cases)
