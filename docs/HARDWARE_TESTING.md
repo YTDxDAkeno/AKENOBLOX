@@ -10,6 +10,23 @@ explains how to reproduce it on other builds and what still needs testing. Every
 > console. Back up what matters on it first. The tests below do not sign in
 > to anything and do not touch Roblox's servers beyond one DNS lookup.
 
+## DNS and PSN-blocking configuration
+
+The PS5 used in the original tests had custom primary DNS `62.210.38.117`,
+which the user intentionally selected to block PSN/Sony services. **Do not
+change this console's DNS settings for AkenoBlox tests.** Such services and
+firmware updates must remain blocked under the user's setup; the reliability
+of a third-party DNS blocker is not itself guaranteed.
+
+The updated Diagnostics screen makes two resolution checks using the existing
+system resolver: `www.roblox.com` and the neutral control `example.com`.
+Neither attempts an HTTPS connection or queries a Sony hostname.
+- If both fail, investigate DNS server availability and the PS5 resolver.
+- If the control succeeds but Roblox fails, investigate selective filtering.
+- If both resolve, this proves DNS resolution only, not HTTPS, UDP or Roblox
+login.
+UDP loopback likewise proves local sockets only, not external multiplayer.
+
 ## What you need
 
 - A PS5 running a homebrew environment: a jailbreak for its firmware, an
