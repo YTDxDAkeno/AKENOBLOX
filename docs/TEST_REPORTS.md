@@ -32,13 +32,28 @@ evidence that Roblox runs anywhere: it does not, yet.
 | Rust std for the console | links; native TLS model incompatible (FEASIBILITY §3.6) |
 | Everything Roblox | NOT TESTED |
 
+## 2026-10-12 — session 1, clean build of `764c088`
+
+A fresh `git clone` of `764c088` (branch `claude/blissful-gauss-9ehj7g`), so
+nothing depended on untracked files:
+
+- host: configure, build, `ctest`: **9 of 9 suites pass**; `--version` prints
+  `AkenoBlox PS5 0.1.0-alpha (764c08841)`. HOST VERIFIED.
+- console: `tools/build/build-ps5.sh` → `dist/PPSA99256/eboot.bin`, 313,033
+  bytes, sha256 `5a96d73590c72efad76091c510d630c11b1c409688294a59c7beecaad0bc3877`;
+  SELF digest `1542d7c7…2566`, `integrity: valid`; 178 imports, none null in a
+  title; `libc.prx` sha256 `e6ff45d1…0036` (PS5_Vulkan's recorded digest);
+  `release/AkenoBlox-PS5-0.1.0-alpha-764c08841.zip`, 182,066 bytes, sha256
+  `7df325c6dd13cfe45aa6dfd626126c17662380c7dcc7597df3efb0fcb7077279`, 10 files,
+  no Roblox file. CROSS-BUILD VERIFIED.
+- console run: **NOT TESTED**.
+
 ## 2026-10-12 — session 1, host and cross-build
 
 **Environment.** Ubuntu 24.04 container, 4 vCPU, GCC 13.3.0, Clang/lld
 18.1.3, CMake 3.28.3, Python 3.13. Payload SDK v0.42 with PS5_PayloadSDK
-`611893f`, PS5_Vulkan `252bf91`. **Build:** the tree of the first commit on
-branch `claude/blissful-gauss-9ehj7g` (exact hash and digests in the next
-entry, once committed).
+`611893f`, PS5_Vulkan `252bf91`. **Build:** the working tree that became `764c088`
+(its clean rebuild is the entry above).
 
 ### Host tests — HOST VERIFIED
 

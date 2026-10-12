@@ -5,8 +5,10 @@ Read this first in every session; update it last.
 **Updated:** 2026-10-12, end of session 1.
 **Phase:** M1 and M2 built, awaiting a console run (docs/ROADMAP.md).
 **Branch:** `claude/blissful-gauss-9ehj7g`.
-**Last good commit:** the head of that branch; its verification is in
-[TEST_REPORTS.md](TEST_REPORTS.md).
+**Last good commit:** `764c088` (code), verified from a fresh clone: host
+tests pass, the title cross-builds, `eboot.bin` sha256 `5a96d735…3877`
+([TEST_REPORTS.md](TEST_REPORTS.md)). Later commits on the branch are
+documentation.
 
 ## What exists
 
