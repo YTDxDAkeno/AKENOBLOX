@@ -49,7 +49,7 @@ regression test.)
 | Which raw system calls does the engine make? | the bionic layer's `syscall` | log them under Cordial on Linux |
 | Which Vulkan features does the engine require? | M4 | trace under Cordial on Linux |
 | Can a title use UDP? | multiplayer (M6) | local-loopback probe in PR #10; must hardware-test; external UDP still unverified |
-| Why does `www.roblox.com` fail DNS resolution? | external services/authentication | reproduce DNS check; review PS5 DNS configuration and platform resolver (error 4) |
+| Why does `www.roblox.com` fail DNS resolution? | external services/authentication | User deliberately configures primary DNS `62.210.38.117` (Nomadic / PSN blocking). Keep it unchanged; probe `example.com` with same system resolver and compare results. This is a possible cause, not a proven one. Error code 4 is resolver-specific. |
 | Roblox does not permit third-party clients | legitimate use | policy; not technical. Test accounts only |
 
 ## Tracking
