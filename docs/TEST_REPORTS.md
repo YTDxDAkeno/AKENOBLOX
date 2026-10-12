@@ -50,7 +50,7 @@ privately for review; this summary avoids distributing raw machine data.
 | ELF loader | **HARDWARE VERIFIED** for the embedded synthetic Android x86-64 fixtures: **13/13 passed**, run four times (712, 670, 669, 713 microseconds) |
 | Relocation and executable memory | **HARDWARE VERIFIED**: APS2 / RELR, 16 KiB pages, W^X (0 W+X pages), constructors/destructors, PLT, GLOB_DAT, loaded code called |
 | Stack-protector test | **PASS for the fixture**, but **ABI completeness NOT VERIFIED**: `%fs:0x28` was stable on both threads yet read as **zero**; investigate actual guard initialization, randomness and consistency with Android |
-| DNS | **FAILED/WARN**: `getaddrinfo("www.roblox.com", "443")` returned 4; no confirmed external DNS or Internet |
+| DNS | **FAILED/WARN**: `getaddrinfo("www.roblox.com", "443")` returned 4; no confirmed external DNS or Internet. The console uses deliberate PSN-blocking DNS `62.210.38.117` (user clarified after the original report). Cause unconfirmed; branch adds neutral `example.com` control without altering DNS |
 | UDP | **NOT TESTED** in this build; a local-only probe exists separately in PR #10, awaiting a console run |
 | Normal exit to PS5 Home | **NOT VERIFIED**: user log contains no exit event |
 | Real Roblox library loading / game rendering | **NOT TESTED**: `libroblox.so` was not installed on the console |
