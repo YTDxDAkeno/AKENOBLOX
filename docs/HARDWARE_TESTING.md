@@ -1,13 +1,31 @@
 # Testing on a console
 
-Nothing in this project has run on a PS5 yet. This page is how to change
-that, and exactly what to send back. Every result, pass or fail, goes into
+The original build `80a3f11f9` passed its synthetic ELF loader self-test
+on a real PS5 running firmware 13.09 (13/13 steps, four runs). This page
+explains how to reproduce it on other builds and what still needs testing. Every result, pass or fail, goes into
 [TEST_REPORTS.md](TEST_REPORTS.md) at the same level of detail.
 
 > [!CAUTION]
 > Experimental homebrew on a modified console can crash the title or the
 > console. Back up what matters on it first. The tests below do not sign in
 > to anything and do not touch Roblox's servers beyond one DNS lookup.
+
+## DNS and PSN-blocking configuration
+
+The PS5 used in the original tests had custom primary DNS `62.210.38.117`,
+which the user intentionally selected to block PSN/Sony services. **Do not
+change this console's DNS settings for AkenoBlox tests.** Such services and
+firmware updates must remain blocked under the user's setup; the reliability
+of a third-party DNS blocker is not itself guaranteed.
+
+The updated Diagnostics screen makes two resolution checks using the existing
+system resolver: `www.roblox.com` and the neutral control `example.com`.
+Neither attempts an HTTPS connection or queries a Sony hostname.
+- If both fail, investigate DNS server availability and the PS5 resolver.
+- If the control succeeds but Roblox fails, investigate selective filtering.
+- If both resolve, this proves DNS resolution only, not HTTPS, UDP or Roblox
+login.
+UDP loopback likewise proves local sockets only, not external multiplayer.
 
 ## What you need
 
@@ -51,9 +69,10 @@ What the results mean:
 |---|---|---|
 | x86-64 level | v2 or better: the engine's instructions run | v1: instruction emulation needed (libbadcpu) |
 | AVX state saved | the kernel enables AVX for titles | AVX code paths would fault |
-| `%fs:0x28`, main and new thread | Android's stack protector can work unmodified | **a blocker for the current architecture**: record it exactly |
+| `%fs:0x28`, main and new thread | stable and nonzero is encouraging but not full Android ABI proof | a changed or **zero** guard requires investigation; 13.09 showed stable zero |
 | ELF self-test: copy, relocate, protect | the console executes code a title copied in | **Phase 2 blocked**: record the step that failed |
 | Android stack protector | a protected call completed | the canary word moved during a call |
+| UDP IPv4 loopback | local datagram sockets work | inspect errno and console network initialization; external multiplayer remains untested either way |
 
 If the title **crashes** during the probes, the last `[AkenoBlox]` line in klog
 names the probe that was running (each is logged before it starts). Send the

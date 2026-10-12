@@ -112,6 +112,7 @@ add_library(akeno_core STATIC
   src/diagnostics/akeno_cpu.c
   src/diagnostics/akeno_selftest.c
   src/diagnostics/akeno_report.c
+  src/diagnostics/akeno_udp.c
   src/runtime/akeno_runtime.c)
 akeno_defaults(akeno_core)
 target_link_libraries(akeno_core PUBLIC akeno_elf akeno_platform)

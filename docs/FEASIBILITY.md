@@ -8,6 +8,20 @@ PSN, streaming or a PC?
 (Cordial `7abbaf5`, PS5_VulkanTemplate `91179df`, PS5_Vulkan `252bf91`,
 prospero-win `644e32e`, Playden `572fc82`, PS5_PayloadSDK fork `611893f`).
 
+**Hardware update (2026-10-12):** User-provided PS5 logs from firmware
+13.09, build `80a3f11f9`, confirm **13/13 synthetic ELF self-test steps
+passed** (four consecutive runs), including executing relocated x86-64
+code from the console's allocated executable pages. The launcher displayed
+1080p frames, recognized DualSense and wrote to `/download0/akenoblox`.
+Two distinct issues remain: DNS to `www.roblox.com` failed with resolver
+code 4; the user subsequently confirmed their PS5 intentionally uses primary
+DNS `62.210.38.117` for PSN blocking. This makes resolver policy/availability
+a candidate cause, but does **not** establish that this DNS produced the error.
+A neutral control-domain lookup is now included in the diagnostics branch;
+do not change the console DNS to run it. The other issue: the observed `%fs:0x28` stack-guard slot was stable but **zero**.
+That confirms the test fixture's call/return path, **not** Android stack
+protector initialization or entropy. See [TEST_REPORTS.md](TEST_REPORTS.md).
+
 **Short answer:** nothing found so far makes it impossible, and the parts
 that were testable from here were tested. It is a large port whose hardest
 part is not the loader but a bionic-to-console libc ABI layer that Cordial
@@ -155,8 +169,9 @@ remain:
   the same offset, which is why this works for Cordial. On the console `%fs`
   is the libc's TLS base (prospero-win patch 0500 keeps it so); what lies at
   `+0x28` is undocumented. If it changes during a call, every protected
-  engine function aborts. **UNCERTAIN**; measured by Diagnostics' `%fs:0x28`
-  probe and the self-test's stack-protected fixture.
+  engine function aborts. **PARTIALLY VERIFIED on 13.09:** the slot stayed stable but read as zero
+  on both main and new threads. The fixture passed, but a properly seeded
+  Android-style stack canary is not established.
 - **Signal contexts.** The console's `ucontext_t` puts `uc_mcontext` 48 bytes
   later than FreeBSD's header, with the FP state at +320 (PS5_PayloadSDK
   `context.h`; prospero-win patches 0500/0501), and signal numbers and
@@ -234,8 +249,9 @@ a host: yes, measured here. `akeno_elf` loads real lld-linked
 `x86_64-linux-android26` objects (plain RELA, APS2, RELR, Android-tagged
 RELR, SysV and GNU hashes, 4 KiB and 16 KiB alignment), resolves imports from
 a host table, runs constructors, calls in, and is checked by the kernel's
-own `/proc/self/maps`. On the console: the same code is in the title as its
-self-test and awaits a console run. **IMPLEMENTABLE**, hardware pending.
+own `/proc/self/maps`. On the console: the same code was exercised on 13.09 with the embedded
+synthetic fixtures: **HARDWARE VERIFIED for this subset** (13/13 steps,
+four runs). Full AOSP linker and Roblox library remain untested.
 
 **3.6 Can Cordial's Rust be cross-compiled for the console?** Measured here
 (`tools/diagnostics/probe-rust-ps5.sh`): a Rust `std` static library built for

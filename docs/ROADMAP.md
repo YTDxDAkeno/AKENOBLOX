@@ -7,8 +7,8 @@ means a run on a real console, recorded.
 | Milestone | State | Acceptance | Issue |
 |---|---|---|---|
 | **M0** Research and architecture | done | feasibility audit with evidence; ADRs; revisions pinned | [#9](https://github.com/YTDxDAkeno/AKENOBLOX/issues/9) |
-| **M1** Native PS5 application | built, awaiting hardware | title builds, signs and packages (done); starts from the home screen, draws, reads the pad, exits cleanly (hardware) | [#1](https://github.com/YTDxDAkeno/AKENOBLOX/issues/1) |
-| **M2** ELF loading proof | built, awaiting hardware | loader passes host tests (done); the Diagnostics self-test passes on a console (hardware). If it fails, the blocker is recorded and Roblox work stops | [#2](https://github.com/YTDxDAkeno/AKENOBLOX/issues/2) |
+| **M1** Native PS5 application | display/pad/storage hardware-verified; exit pending | title builds, signs and packages (done); starts from the home screen, draws, reads the pad, exits cleanly (hardware) | [#1](https://github.com/YTDxDAkeno/AKENOBLOX/issues/1) |
+| **M2** ELF loading proof | **done on 13.09** (13/13 hardware probes) | loader passes host tests (done); the Diagnostics self-test passes on a console (hardware). If it fails, the blocker is recorded and Roblox work stops | [#2](https://github.com/YTDxDAkeno/AKENOBLOX/issues/2) |
 | **M3** Android compatibility runtime | not started | AOSP linker ported; bionic ABI layer; libjnivm; a synthetic Android library initialised through `JNI_OnLoad` and GameActivity on a host and a console | [#3](https://github.com/YTDxDAkeno/AKENOBLOX/issues/3) |
 | **M4** Graphics and audio | not started | RADV linked; a synthetic Android Vulkan program draws through the virtual `libvulkan` and `VK_KHR_display`; OpenSL ES plays through AudioOut | [#4](https://github.com/YTDxDAkeno/AKENOBLOX/issues/4) |
 | **M5** Roblox engine initialisation | not started | the user's `libroblox.so` loads, constructors run, `JNI_OnLoad` and GameActivity's native init complete, the engine logs its own start-up | [#5](https://github.com/YTDxDAkeno/AKENOBLOX/issues/5) |
@@ -20,9 +20,10 @@ means a run on a real console, recorded.
 
 In dependency order:
 
-1. **Console run of v0.1.0-alpha** (M1, M2): the user runs
-   [HARDWARE_TESTING.md](HARDWARE_TESTING.md) tests 1 and 2. Everything after
-   depends on whether the self-test passes and what `%fs:0x28` does.
+1. **Record the successful M2 hardware evidence** and verify the separate
+   clean exit requirement for M1. The original build `80a3f11f9` passed
+   13/13 ELF loader probes on PS5 firmware 13.09 (TEST_REPORTS.md).
+   `%fs:0x28` was stable but zero; investigate guard initialization.
 2. **Record the engine's system calls and Vulkan features on Linux** under
    Cordial with logging wrappers (FEASIBILITY §2.3, §4.2): two of the
    UNCERTAIN rows, answerable without a console.
@@ -32,8 +33,9 @@ In dependency order:
 4. **The bionic ABI layer** (M3): errno, signals, sockets, stat, pthread
    (`pthread_once` first), epoll over kqueue, `long double`, each with a host
    test that runs the bionic-side expectation against the shim.
-5. **A UDP probe in Diagnostics** (M6's main risk): send and receive on a
-   loopback or LAN socket from the title.
+5. **Hardware-test the new local UDP probe** (PR #10); this tests only loopback
+   socket functionality, not external Roblox UDP. Investigate the DNS error 4
+   from the first 13.09 run.
 6. **Build RADV** for the engine (M4): PS5_Vulkan's `tools/build-radv.sh
    release` and its host LLVM/libclc prerequisites, in CI if it fits.
 

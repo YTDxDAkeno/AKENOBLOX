@@ -119,18 +119,28 @@ akeno_report_fs_probe(akeno_report *r, const akeno_fs_probe *p)
       akeno_report_add(r, "Android ABI", AKENO_ROW_PENDING, "%fs:0x28 canary word", "not run");
       return;
    }
-   akeno_report_add(r, "Android ABI", p->main_stable ? AKENO_ROW_OK : AKENO_ROW_FAIL,
-                    "%fs:0x28, main thread", "%s (0x%016llx)", p->main_stable ? "stable" : "CHANGED",
-                    (unsigned long long)p->main_first);
+   /* The stack canary is process-sensitive information. Its actual value
+    * must not end up in a world-readable report uploaded for debugging. */
+   /* Stability is necessary but not sufficient: firmware 13.09 returned
+    * a stable zero word. Report that as a warning, not as a validated
+    * Android-compatible stack guard. Never export the raw value. */
+   const bool main_zero = p->main_first == 0;
+   akeno_report_add(r, "Android ABI",
+                    !p->main_stable ? AKENO_ROW_FAIL : main_zero ? AKENO_ROW_WARN : AKENO_ROW_OK,
+                    "%fs:0x28, main thread", "%s (canary value redacted)",
+                    !p->main_stable ? "CHANGED" : main_zero ? "stable, zero value" : "stable");
    if (!p->thread_ran) {
       akeno_report_add(r, "Android ABI", AKENO_ROW_WARN, "%fs:0x28, new thread",
                        "pthread_create failed");
       return;
    }
-   akeno_report_add(r, "Android ABI", p->thread_stable ? AKENO_ROW_OK : AKENO_ROW_FAIL,
-                    "%fs:0x28, new thread", "%s (%s the main thread's)",
-                    p->thread_stable ? "stable" : "CHANGED",
-                    p->differs_between_threads ? "differs from" : "same as");
+   akeno_report_add(r, "Android ABI",
+                    !p->thread_stable ? AKENO_ROW_FAIL
+                    : p->thread_first == 0 ? AKENO_ROW_WARN : AKENO_ROW_OK,
+                    "%fs:0x28, new thread", "%s (%s the main thread's%s)",
+                    !p->thread_stable ? "CHANGED" : "stable",
+                    p->differs_between_threads ? "differs from" : "same as",
+                    p->thread_first == 0 ? ", zero value" : "");
 }
 
 void

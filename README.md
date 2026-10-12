@@ -7,9 +7,8 @@ GPL-3.0-or-later.
 
 > [!WARNING]
 > **AkenoBlox does not run Roblox yet.** This is v0.1.0-alpha: a launcher, the
-> first runtime layers, and a hardware self-test. **Nothing in it has run on a
-> console yet**; it builds, signs and packages as a title, and its tests pass on
-> a Linux host. What is done and what is not: [Runtime status](#status).
+> first runtime layers, and a hardware self-test. **Its ELF loader self-test passed on one PS5 running firmware 13.09**;
+> Roblox has NOT run. Other systems and firmwares remain unverified. What is done and what is not: [Runtime status](#status).
 
 ## Why it might work
 
@@ -26,8 +25,8 @@ layer) instead of Linux's. The evidence, and the open questions, are in
 
 | Layer | State |
 |---|---|
-| Launcher: menu, settings, diagnostics, DualSense, VideoOut display | cross-built and packaged; host-tested |
-| ELF loader (`akeno_elf`): RELA, APS2, RELR, IFUNC, constructors | host-verified, fuzzed; console self-test built in |
+| Launcher: menu, settings, diagnostics, DualSense, VideoOut display | firmware 13.09: display/pad/storage verified; clean exit unverified |
+| ELF loader (`akeno_elf`): RELA, APS2, RELR, IFUNC, constructors | 13/13 embedded PS5 hardware probes passed (four runs); extended features host-tested |
 | AOSP linker port | probed: 18 compile errors, all understood |
 | bionic ABI on the console's libc | not started |
 | JNI VM, Android framework, graphics, audio | not started |

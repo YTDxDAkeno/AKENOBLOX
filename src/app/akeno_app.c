@@ -18,6 +18,7 @@
 #include "diagnostics/akeno_cpu.h"
 #include "diagnostics/akeno_report.h"
 #include "diagnostics/akeno_selftest.h"
+#include "diagnostics/akeno_udp.h"
 #include "input/akeno_input.h"
 #include "runtime/akeno_runtime.h"
 #include "ui/akeno_screens.h"
@@ -48,6 +49,10 @@ typedef struct app {
    char storage_detail[96];
    int network_check; /* -1 not run, 0 failed, 1 passed */
    char network_detail[128];
+   int dns_control_check; /* -1 not run, 0 failed, 1 resolved */
+   char dns_control_detail[128];
+   int udp_check; /* -1 not run, 0 unavailable, 1 loopback passed */
+   char udp_detail[128];
    char toast[96];
    uint64_t toast_until_us;
    akeno_frame frame;
@@ -89,6 +94,20 @@ rebuild_report(app *a)
                                            : AKENO_ROW_WARN,
                     "Network (DNS only)", "%s",
                     a->network_check < 0 ? "not checked" : a->network_detail);
+   /* A control domain distinguishes "the resolver cannot resolve anything"
+    * from a domain-specific failure. Neither lookup contacts a Sony host. */
+   akeno_report_add(&a->report, "Network",
+                    a->dns_control_check < 0   ? AKENO_ROW_PENDING
+                    : a->dns_control_check > 0 ? AKENO_ROW_OK
+                                               : AKENO_ROW_WARN,
+                    "DNS control (example.com)", "%s",
+                    a->dns_control_check < 0 ? "not checked" : a->dns_control_detail);
+   akeno_report_add(&a->report, "Network",
+                    a->udp_check < 0   ? AKENO_ROW_PENDING
+                    : a->udp_check > 0 ? AKENO_ROW_OK
+                                       : AKENO_ROW_WARN,
+                    "UDP IPv4 loopback", "%s",
+                    a->udp_check < 0 ? "not checked (external UDP unverified)" : a->udp_detail);
    akeno_report_cpu(&a->report, &a->cpu);
    akeno_report_fs_probe(&a->report, &a->fs_probe);
    akeno_report_selftest(&a->report, &a->selftest);
@@ -135,6 +154,13 @@ run_probes(app *a)
    a->network_check = akeno_platform_network_check("www.roblox.com", a->network_detail,
                                                     sizeof(a->network_detail)) == 0;
    AKENO_INFO("probes: network: %s", a->network_detail);
+   AKENO_INFO("probes: DNS control (example.com, lookup only)");
+   a->dns_control_check = akeno_platform_network_check("example.com", a->dns_control_detail,
+                                                       sizeof(a->dns_control_detail)) == 0;
+   AKENO_INFO("probes: DNS control: %s", a->dns_control_detail);
+   AKENO_INFO("probes: UDP IPv4 loopback (local socket only)");
+   a->udp_check = akeno_udp_loopback_probe(a->udp_detail, sizeof(a->udp_detail)) == 0;
+   AKENO_INFO("probes: UDP loopback: %s", a->udp_detail);
    AKENO_INFO("probes: ELF loader self-test");
    akeno_selftest_run(akeno_platform_code_memory(), true, &a->selftest);
    a->probes_ran = true;
@@ -213,6 +239,8 @@ akeno_app_run(const akeno_app_options *opt)
    akeno_gamepad_mapping_default(&a.mapping);
    a.storage_check = -1;
    a.network_check = -1;
+   a.dns_control_check = -1;
+   a.udp_check = -1;
    akeno_menu_init(&a.menu, &a.settings, akeno_platform_now_us());
    akeno_input_tracker_reset(&a.tracker);
    rebuild_report(&a);

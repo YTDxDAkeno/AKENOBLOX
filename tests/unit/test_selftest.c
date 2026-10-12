@@ -9,6 +9,7 @@
 #include "diagnostics/akeno_cpu.h"
 #include "diagnostics/akeno_report.h"
 #include "diagnostics/akeno_selftest.h"
+#include "diagnostics/akeno_udp.h"
 
 static void
 run_with(const akeno_mem_ops *mem)
@@ -67,6 +68,54 @@ test_fs_probe_on_host(void)
 }
 
 static void
+test_report_redacts_canary(void)
+{
+   akeno_fs_probe p = {0};
+   p.ran = true;
+   p.main_stable = true;
+   p.main_first = UINT64_C(0xdeadbeefcad0babe);
+   p.thread_ran = true;
+   p.thread_stable = true;
+   akeno_report r;
+   akeno_report_clear(&r);
+   akeno_report_fs_probe(&r, &p);
+   CHECK_EQ_INT(r.count, 2);
+   CHECK(r.rows[0].status == AKENO_ROW_OK);
+   CHECK(strstr(r.rows[0].value, "redacted") != NULL);
+   CHECK(strstr(r.rows[0].value, "deadbeef") == NULL);
+   CHECK(strstr(r.rows[0].value, "0x") == NULL);
+}
+
+static void
+test_report_warns_zero_canary(void)
+{
+   akeno_fs_probe p = {0};
+   p.ran = true;
+   p.main_stable = true;
+   p.main_first = 0;
+   p.thread_ran = true;
+   p.thread_stable = true;
+   p.thread_first = 0;
+   akeno_report r;
+   akeno_report_clear(&r);
+   akeno_report_fs_probe(&r, &p);
+   CHECK_EQ_INT(r.count, 2);
+   CHECK(r.rows[0].status == AKENO_ROW_WARN);
+   CHECK(r.rows[1].status == AKENO_ROW_WARN);
+   CHECK(strstr(r.rows[0].value, "zero value") != NULL);
+   CHECK(strstr(r.rows[0].value, "redacted") != NULL);
+}
+
+static void
+test_udp_loopback(void)
+{
+   char summary[128];
+   CHECK_EQ_INT(akeno_udp_loopback_probe(summary, sizeof(summary)), 0);
+   CHECK(strstr(summary, "UDP IPv4 loopback") != NULL);
+   CHECK_EQ_INT(akeno_udp_loopback_probe(NULL, 0), -1);
+}
+
+static void
 test_report(void)
 {
    akeno_report r;
@@ -94,6 +143,9 @@ static const akeno_test_case cases[] = {
    {"cpu_levels", test_cpu_levels},
    {"fs_probe_on_host", test_fs_probe_on_host},
    {"report", test_report},
+   {"udp_loopback", test_udp_loopback},
+   {"report_redacts_canary", test_report_redacts_canary},
+   {"report_warns_zero_canary", test_report_warns_zero_canary},
 };
 
 AKENO_TEST_MAIN(cases)

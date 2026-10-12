@@ -2,9 +2,9 @@
 
 Read this first in every session; update it last.
 
-**Updated:** 2026-10-12, end of session 1.
-**Phase:** M1 and M2 built, awaiting a console run (docs/ROADMAP.md).
-**Branch:** `claude/blissful-gauss-9ehj7g`.
+**Updated:** 2026-10-12, first real PS5 logs analyzed.
+**Phase:** M2 loader hardware gate PASSED on firmware 13.09; M1 launcher partially hardware-verified (exit missing); M3 linker port next.
+**Branch:** `chatgpt/udp-loopback-diagnostics` (Draft PR #10 targeting `claude/blissful-gauss-9ehj7g`).
 **Last good commit:** `764c088` (code), verified from a fresh clone: host
 tests pass, the title cross-builds, `eboot.bin` sha256 `5a96d735…3877`
 ([TEST_REPORTS.md](TEST_REPORTS.md)). Later commits on the branch are
@@ -32,8 +32,8 @@ documentation.
 |---|---|
 | Everything above, on a host | HOST VERIFIED |
 | The title | CROSS-BUILD VERIFIED |
-| Anything on a console | **NOT TESTED** |
-| Anything involving Roblox's engine | **NOT TESTED**; nothing loads it yet |
+| ELF loader synthetic fixture, 13 tests; CPU, VideoOut, pad, storage on firmware 13.09 | **HARDWARE VERIFIED**: original build `80a3f11f9`, user-provided logs |
+| Anything involving Roblox's engine | **NOT TESTED**; no `libroblox.so` installed |
 
 ## Open bugs
 
@@ -44,11 +44,12 @@ regression test.)
 
 | Question | Blocks | How to answer |
 |---|---|---|
-| Does the console execute code a title copied into an `exec.h` region? | M2, everything after | Diagnostics self-test on a console |
-| Is `%fs:0x28` stable on the console? | the engine's stack-protected functions | Diagnostics `%fs` probe on a console |
+| Does the console execute code a title copied into an `exec.h` region? | **RESOLVED on firmware 13.09 for synthetic fixtures** | 13/13 PS5 self-test, four runs, logs in TEST_REPORTS.md |
+| Is `%fs:0x28` stable and properly seeded on the console? | engine stack-protected functions | Stable in both threads, but value **zero**; requires further ABI/guard analysis |
 | Which raw system calls does the engine make? | the bionic layer's `syscall` | log them under Cordial on Linux |
 | Which Vulkan features does the engine require? | M4 | trace under Cordial on Linux |
-| Can a title use UDP? | multiplayer (M6) | a UDP probe in Diagnostics |
+| Can a title use UDP? | multiplayer (M6) | local-loopback probe in PR #10; must hardware-test; external UDP still unverified |
+| Why does `www.roblox.com` fail DNS resolution? | external services/authentication | User deliberately configures primary DNS `62.210.38.117` (Nomadic / PSN blocking). Keep it unchanged; probe `example.com` with same system resolver and compare results. This is a possible cause, not a proven one. Error code 4 is resolver-specific. |
 | Roblox does not permit third-party clients | legitimate use | policy; not technical. Test accounts only |
 
 ## Tracking
@@ -60,16 +61,14 @@ in TEST_REPORTS.md.
 
 ## Next tasks
 
-1. Get a console run of v0.1.0-alpha (HARDWARE_TESTING.md tests 1-2; issues
-   #1 and #2). If the self-test fails, record it in FEASIBILITY.md and stop
-   Roblox work until it is understood.
+1. Record and preserve the successful M2 console evidence (TEST_REPORTS.md) and close M2 issue only after reviewing the recorded result; verify clean shell exit for M1 separately.
 2. Under Cordial on Linux, record the engine's `syscall` numbers and Vulkan
    feature requests.
 3. Port the AOSP linker (patches in `patches/`), tested against the existing
    fixtures and compared with `akeno_elf`.
 4. Start the bionic ABI layer: `pthread_once`, then pthread objects, errno,
    signals, sockets, epoll over kqueue, `long double`.
-5. Add a UDP probe to Diagnostics.
+5. Hardware-test PR #10's local-only UDP probe; investigate DNS failure and zero stack canary; do not infer real multiplayer connectivity.
 
 ## Environment notes for the next session
 
