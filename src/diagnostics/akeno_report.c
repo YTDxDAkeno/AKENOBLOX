@@ -119,9 +119,11 @@ akeno_report_fs_probe(akeno_report *r, const akeno_fs_probe *p)
       akeno_report_add(r, "Android ABI", AKENO_ROW_PENDING, "%fs:0x28 canary word", "not run");
       return;
    }
+   /* The stack canary is process-sensitive information. Its actual value
+    * must not end up in a world-readable report uploaded for debugging. */
    akeno_report_add(r, "Android ABI", p->main_stable ? AKENO_ROW_OK : AKENO_ROW_FAIL,
-                    "%fs:0x28, main thread", "%s (0x%016llx)", p->main_stable ? "stable" : "CHANGED",
-                    (unsigned long long)p->main_first);
+                    "%fs:0x28, main thread", "%s (canary value redacted)",
+                    p->main_stable ? "stable" : "CHANGED");
    if (!p->thread_ran) {
       akeno_report_add(r, "Android ABI", AKENO_ROW_WARN, "%fs:0x28, new thread",
                        "pthread_create failed");
