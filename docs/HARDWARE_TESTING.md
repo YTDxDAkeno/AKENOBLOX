@@ -54,6 +54,7 @@ What the results mean:
 | `%fs:0x28`, main and new thread | Android's stack protector can work unmodified | **a blocker for the current architecture**: record it exactly |
 | ELF self-test: copy, relocate, protect | the console executes code a title copied in | **Phase 2 blocked**: record the step that failed |
 | Android stack protector | a protected call completed | the canary word moved during a call |
+| UDP IPv4 loopback | local datagram sockets work | inspect errno and console network initialization; external multiplayer remains untested either way |
 
 If the title **crashes** during the probes, the last `[AkenoBlox]` line in klog
 names the probe that was running (each is logged before it starts). Send the
