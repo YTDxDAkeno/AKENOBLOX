@@ -25,8 +25,9 @@ fixed buffers; unknown keys are ignored, out-of-range values clamped.
 
 **The console.** The title writes only under its own storage directory
 (`/data/akenoblox` or `/download0/akenoblox`) and its title folder; it opens no
-listening sockets; it makes one DNS query (for the Diagnostics network row)
-when asked. It does not elevate itself, load payloads, or touch the kernel.
+listening sockets; it makes one DNS query and one local-only UDP loopback round-trip (for the
+Diagnostics network rows) when asked. It does not send UDP traffic to external
+servers. Exported reports redact the stack-protector canary value. It does not elevate itself, load payloads, or touch the kernel.
 
 **Roblox.** The project never patches, hooks or injects into the engine,
 never spoofs device integrity, never forges tokens and never rewrites the
